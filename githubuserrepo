@@ -1,0 +1,55 @@
+import requests
+import json
+
+def get_user_repos_and_commits(user_id):
+    """
+    Retrieves the list of repositories and the number of commits for each repository
+    for a given GitHub user ID.
+
+    Args:
+        user_id (str): The GitHub user ID.
+
+    Returns:
+        dict: A dictionary where keys are repository names and values are commit counts.
+    """
+    repos_url = f"https://api.github.com/users/{user_id}/repos"
+    repos_response = requests.get(repos_url)
+
+    if repos_response.status_code != 200:
+        raise Exception(f"Failed to fetch repositories for user {user_id}. Status code: {repos_response.status_code}")
+
+    repos_data = repos_response.json()
+    repo_commit_counts = {}
+
+    for repo in repos_data:
+        repo_name = repo['name']
+        commits_url = f"https://api.github.com/repos/{user_id}/{repo_name}/commits"
+        commits_response = requests.get(commits_url)
+
+        if commits_response.status_code != 200:
+            raise Exception(f"Failed to fetch commits for repository {repo_name}. Status code: {commits_response.status_code}")
+
+        commits_data = commits_response.json()
+        commit_count = len(commits_data)
+        repo_commit_counts[repo_name] = commit_count
+
+    return repo_commit_counts
+
+def display_repo_commit_counts(user_id):
+    """
+    Displays the repository names and their commit counts for a given GitHub user ID.
+
+    Args:
+        user_id (str): The GitHub user ID.
+    """
+    try:
+        repo_commit_counts = get_user_repos_and_commits(user_id)
+        for repo, commit_count in repo_commit_counts.items():
+            print(f"Repo: {repo} Number of commits: {commit_count}")
+    except Exception as e:
+        print(f"Error: {e}")
+
+# Example usage
+if __name__ == "__main__":
+    user_id = "richkempinski"  # Replace with any GitHub user ID
+    display_repo_commit_counts(user_id)
