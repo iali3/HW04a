@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from your_module import get_user_repos_and_commits  # Replace 'your_module' with the actual module name
+from githubuserrepo import get_user_repos_and_commits  
 
 class TestGitHubAPI(unittest.TestCase):
     @patch('requests.get')
